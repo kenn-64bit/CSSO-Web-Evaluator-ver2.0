@@ -7,7 +7,6 @@ create table roster (
   email       citext unique not null,
   full_name   text not null,
   role        app_role not null,
-  department  text,
   is_active   boolean not null default true,
   created_at  timestamptz not null default now(),
   constraint roster_email_domain check (email like '%@cvsu.edu.ph')

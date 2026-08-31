@@ -2,7 +2,7 @@
 
 create table forms (
   id             uuid primary key default gen_random_uuid(),
-  code           text unique not null,      -- 'EMP_TO_OFFICER'
+  code           text unique not null,      -- 'ENCRYPT_TO_OFFICER'
   title          text not null,
   description    text,
   evaluator_role app_role not null,         -- who must fill this out

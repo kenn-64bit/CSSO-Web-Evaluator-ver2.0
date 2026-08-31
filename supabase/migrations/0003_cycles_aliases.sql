@@ -19,7 +19,7 @@ create table aliases (
   id         uuid primary key default gen_random_uuid(),
   cycle_id   uuid not null references evaluation_cycles(id) on delete cascade,
   user_id    uuid not null references profiles(id) on delete cascade,
-  alias_code text not null,          -- 'OFFICER01', 'EMP0042'
+  alias_code text not null,          -- 'OFFICER01', 'ENC0042'
   unique (cycle_id, user_id),
   unique (cycle_id, alias_code)
 );

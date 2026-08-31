@@ -101,7 +101,7 @@ export async function getFormForAssignment(
       id: q.id,
       orderIndex: q.order_index,
       prompt: q.prompt,
-      kind: q.kind,
+      kind: q.kind as FormQuestion["kind"],
       isRequired: q.is_required,
     })),
     scaleOptions,

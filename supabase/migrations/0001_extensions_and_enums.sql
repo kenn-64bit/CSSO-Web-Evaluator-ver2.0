@@ -4,4 +4,4 @@
 create extension if not exists citext with schema public;
 create extension if not exists pgcrypto with schema public; -- gen_random_uuid()
 
-create type app_role as enum ('employee', 'officer', 'executive', 'president', 'admin');
+create type app_role as enum ('encrypt', 'officer', 'executive', 'president', 'admin');
