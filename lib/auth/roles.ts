@@ -3,7 +3,7 @@ import type { AppRole } from "@/types/database";
 // Spec §3: roles are a LOOKUP, not a hierarchy. There is deliberately no
 // ordering here and no `role >= X` anywhere in the codebase.
 export const APP_ROLES = [
-  "employee",
+  "encrypt",
   "officer",
   "executive",
   "president",
@@ -12,7 +12,7 @@ export const APP_ROLES = [
 
 // Where each role lands after login (spec §4 step 5, §7).
 export const ROLE_HOME: Record<AppRole, string> = {
-  employee: "/employee",
+  encrypt: "/encrypt",
   officer: "/officer",
   executive: "/executive",
   president: "/president",

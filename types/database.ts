@@ -18,7 +18,7 @@ export type Json =
   | Json[];
 
 export type AppRole =
-  | "employee"
+  | "encrypt"
   | "officer"
   | "executive"
   | "president"
@@ -36,7 +36,6 @@ export interface Database {
           email: string;
           full_name: string;
           role: AppRole;
-          department: string | null;
           is_active: boolean;
           created_at: string;
         };
@@ -45,7 +44,6 @@ export interface Database {
           email: string;
           full_name: string;
           role: AppRole;
-          department?: string | null;
           is_active?: boolean;
           created_at?: string;
         };
@@ -53,7 +51,6 @@ export interface Database {
           email?: string;
           full_name?: string;
           role?: AppRole;
-          department?: string | null;
           is_active?: boolean;
         };
         Relationships: [];

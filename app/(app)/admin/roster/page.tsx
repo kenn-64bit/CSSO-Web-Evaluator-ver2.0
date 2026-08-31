@@ -24,7 +24,6 @@ export default async function AdminRosterPage() {
             <Th>Name</Th>
             <Th>Email</Th>
             <Th>Role</Th>
-            <Th>Department</Th>
             <Th>Active</Th>
           </>
         }
@@ -34,7 +33,6 @@ export default async function AdminRosterPage() {
             <Td>{r.fullName}</Td>
             <Td>{r.email}</Td>
             <Td>{r.role}</Td>
-            <Td>{r.department ?? "—"}</Td>
             <Td>{r.isActive ? "Yes" : "No"}</Td>
           </tr>
         ))}

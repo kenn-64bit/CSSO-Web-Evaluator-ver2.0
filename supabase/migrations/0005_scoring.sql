@@ -2,7 +2,7 @@
 -- Weights are DATA, not app constants: an admin retunes them in Studio.
 
 create table rating_scales (
-  key   text primary key,        -- 'employee_default', 'officer_default'
+  key   text primary key,        -- 'encrypt_default', 'officer_default'
   label text not null
 );
 

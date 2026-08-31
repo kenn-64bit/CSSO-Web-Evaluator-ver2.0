@@ -13,7 +13,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 
-const APP_ROLES = ["employee", "officer", "executive", "president", "admin"];
+const APP_ROLES = ["encrypt", "officer", "executive", "president", "admin"];
 const CVSU_DOMAIN = "@cvsu.edu.ph";
 
 function fail(message) {
@@ -83,7 +83,7 @@ if (existing) {
 
 const { data: finalRow, error: finalError } = await db
   .from("roster")
-  .select("id, email, full_name, role, department, is_active")
+  .select("id, email, full_name, role, is_active")
   .eq("id", resultId)
   .single();
 if (finalError) fail(`re-read failed: ${finalError.message}`);
