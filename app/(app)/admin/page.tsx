@@ -19,6 +19,12 @@ export default async function AdminHome() {
           description: "Read-only. Membership is edited in Supabase Studio.",
         },
         {
+          href: "/admin/forms",
+          label: "Forms",
+          description:
+            "Read-only. All form definitions, questions, and scoring weights.",
+        },
+        {
           href: "/admin/cycles",
           label: "Cycles",
           description: "Open or close a cycle, regenerate aliases, refresh scores.",
