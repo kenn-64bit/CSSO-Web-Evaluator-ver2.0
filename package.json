@@ -11,7 +11,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "db:reset": "supabase db reset",
-    "db:types": "supabase gen types typescript --local > types/database.ts"
+    "db:types": "supabase gen types typescript --local > types/database.ts",
+    "set-roster-role": "node --env-file=.env.local scripts/set-roster-role.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.5",
