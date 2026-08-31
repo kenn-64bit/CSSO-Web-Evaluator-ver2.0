@@ -1,6 +1,6 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { AppRole } from "@/lib/auth/roles";
+import { APP_ROLES, type AppRole } from "@/lib/auth/roles";
 import type { FormQuestion, ScaleOption } from "@/lib/queries/forms";
 
 // Read-only inspector for admins: every form definition, its questions, and the
@@ -31,9 +31,17 @@ export interface RatingScaleSummary {
   usedByFormCodes: string[];
 }
 
-export interface AdminFormsData {
+// Forms are browsed by the role that fills them out: one collapsible section per
+// evaluator role (spec §5 "diagram 4"). Each group carries only the rating
+// scale(s) its own forms reference — there is no global scale list.
+export interface AdminFormGroup {
+  evaluatorRole: AppRole;
   forms: AdminFormRow[];
   scales: RatingScaleSummary[];
+}
+
+export interface AdminFormsData {
+  groups: AdminFormGroup[];
 }
 
 export async function getAllFormsWithScoring(): Promise<AdminFormsData> {
@@ -98,14 +106,29 @@ export async function getAllFormsWithScoring(): Promise<AdminFormsData> {
       : [],
   }));
 
-  const scaleSummaries: RatingScaleSummary[] = (scales ?? []).map((s) => ({
-    key: s.key,
-    label: s.label,
-    options: optionsByScale.get(s.key) ?? [],
-    usedByFormCodes: formRows
-      .filter((f) => f.ratingScaleKey === s.key)
-      .map((f) => f.code),
-  }));
+  const scalesByKey = new Map((scales ?? []).map((s) => [s.key, s]));
 
-  return { forms: formRows, scales: scaleSummaries };
+  // Bucket forms by evaluator role, in the canonical role order, dropping roles
+  // with no forms. Each group's scale summaries cover only its own forms.
+  const groups: AdminFormGroup[] = APP_ROLES.map((role) => {
+    const groupForms = formRows.filter((f) => f.evaluatorRole === role);
+    const scaleKeys = [
+      ...new Set(
+        groupForms
+          .map((f) => f.ratingScaleKey)
+          .filter((k): k is string => k !== null),
+      ),
+    ];
+    const groupScales: RatingScaleSummary[] = scaleKeys.map((key) => ({
+      key,
+      label: scalesByKey.get(key)?.label ?? key,
+      options: optionsByScale.get(key) ?? [],
+      usedByFormCodes: groupForms
+        .filter((f) => f.ratingScaleKey === key)
+        .map((f) => f.code),
+    }));
+    return { evaluatorRole: role, forms: groupForms, scales: groupScales };
+  }).filter((g) => g.forms.length > 0);
+
+  return { groups };
 }

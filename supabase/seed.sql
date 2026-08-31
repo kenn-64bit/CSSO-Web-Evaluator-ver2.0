@@ -54,6 +54,7 @@ insert into evaluation_cycles (name, opens_at, closes_at, is_active) values
 
 -- ── Local-dev roster (real sign-in requires these emails to exist here) ──────
 insert into roster (email, full_name, role, is_active) values
+  ('kenn.jarangue@cvsu.edu.ph',      'Kenn Jarangue',   'admin',   true),
   ('jonmer.evangelista@cvsu.edu.ph',      'Jonmer Evangelista',   'officer',   true),
   ('macielito.devera@cvsu.edu.ph',      'Ma. Cielito De VERA',    'officer',   true),
   ('mikeangelo.metillo@cvsu.edu.ph',      'Angelo Metillo',    'officer',   true),
