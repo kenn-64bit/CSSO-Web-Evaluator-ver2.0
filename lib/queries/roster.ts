@@ -1,6 +1,6 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { AppRole } from "@/types/database";
+import type { AppRole } from "@/lib/auth/roles";
 
 export interface RosterEntry {
   id: string;

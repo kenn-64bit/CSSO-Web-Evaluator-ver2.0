@@ -1,4 +1,6 @@
-import type { AppRole } from "@/types/database";
+import type { Database } from "@/types/database";
+
+export type AppRole = Database["public"]["Enums"]["app_role"];
 
 // Spec §3: roles are a LOOKUP, not a hierarchy. There is deliberately no
 // ordering here and no `role >= X` anywhere in the codebase.

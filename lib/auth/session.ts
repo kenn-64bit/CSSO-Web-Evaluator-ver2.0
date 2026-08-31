@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
-import type { AppRole } from "@/types/database";
 import { createClient } from "@/lib/supabase/server";
-import { homeForRole } from "@/lib/auth/roles";
+import { homeForRole, type AppRole } from "@/lib/auth/roles";
 
 export interface CurrentUser {
   id: string;
