@@ -4,9 +4,33 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Status
 
-This repo currently contains **only design docs** — no application code, no `package.json`, no build/test tooling yet. The app described below is to be built. When scaffolding it, follow the stack and layout in [architecture (1).md](architecture%20(1).md), which is the authoritative spec: "When code and this file disagree, treat this file as the intended design and flag the divergence."
+Scaffolded. The Next.js App Router project, the full Supabase schema (migrations
+`supabase/migrations/0001..0013`, `supabase/seed.sql`), the query layer, all routes from
+spec §7, and the required alias-invariant test exist. [architecture (1).md](architecture%20(1).md)
+remains authoritative: "When code and this file disagree, treat this file as the intended
+design and flag the divergence."
 
-Once the Next.js app exists, expected commands (per the spec's stack) will be `next dev` / `next build` / `next lint`, plus `supabase gen types typescript` to regenerate [types/database.ts]. Update this section with the real commands (including how to run a single test) once tooling is in place.
+### Commands
+
+- `npm run dev` / `npm run build` / `npm run lint` — Next.js.
+- `npm run typecheck` — `tsc --noEmit` (strict, no `any`).
+- `npm test` — Vitest (all suites). Single file: `npx vitest run tests/alias-invariant.test.ts`.
+  The alias-invariant suite auto-skips unless `NEXT_PUBLIC_SUPABASE_URL`,
+  `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` are set.
+- `supabase start` (needs Docker) → `supabase db reset` applies migrations + seed.
+- `npm run db:types` — regenerate `types/database.ts` from the local stack. The committed
+  `types/database.ts` is a **hand-written placeholder** (flagged in-file) until a local stack
+  is available; replace it with generated output.
+
+### Known divergences from spec to revisit
+
+- `types/database.ts` is hand-authored, not generated (no Docker in the scaffold env).
+- `current_role()` is named `current_app_role()` to avoid the reserved word.
+- Extra definer-rights views not in the spec — `my_assignments_view` (evaluator worklist;
+  needed because `profiles`/`roster` are non-admin-unreadable) and `officer_results_visible`
+  (wraps `officer_results_view` with the O-3 ≥3 threshold).
+- Open questions O-1..O-6 are built to their documented defaults; each is flagged with an
+  `O-n` comment at the relevant code/SQL site.
 
 ## What this app is
 
