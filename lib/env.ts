@@ -1,9 +1,12 @@
 // Central, validated access to environment variables. Values are read lazily so
 // a missing var fails at request time with a clear message rather than breaking
 // `next build` at module-evaluation time.
+//
+// Public vars are accessed via *static* `process.env.X` expressions: Next.js only
+// inlines `NEXT_PUBLIC_*` into the client bundle for static member accesses, so a
+// dynamic `process.env[name]` would always be undefined in a 'use client' module.
 
-function required(name: string): string {
-  const value = process.env[name];
+function required(name: string, value: string | undefined): string {
   if (!value) {
     throw new Error(`Missing required environment variable: ${name}`);
   }
@@ -12,10 +15,13 @@ function required(name: string): string {
 
 export const env = {
   get supabaseUrl() {
-    return required("NEXT_PUBLIC_SUPABASE_URL");
+    return required("NEXT_PUBLIC_SUPABASE_URL", process.env.NEXT_PUBLIC_SUPABASE_URL);
   },
   get supabaseAnonKey() {
-    return required("NEXT_PUBLIC_SUPABASE_ANON_KEY");
+    return required(
+      "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    );
   },
   get siteUrl() {
     return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
@@ -26,5 +32,5 @@ export function getServiceRoleKey(): string {
   if (typeof window !== "undefined") {
     throw new Error("SUPABASE_SERVICE_ROLE_KEY must never be read in the browser.");
   }
-  return required("SUPABASE_SERVICE_ROLE_KEY");
+  return required("SUPABASE_SERVICE_ROLE_KEY", process.env.SUPABASE_SERVICE_ROLE_KEY);
 }
