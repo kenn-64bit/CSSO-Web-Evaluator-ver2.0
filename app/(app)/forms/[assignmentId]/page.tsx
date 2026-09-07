@@ -20,17 +20,25 @@ export default async function FormDetailPage({
 
   if (form.alreadySubmitted) {
     return (
-      <Card title={form.formTitle}>
-        <p className="text-sm text-neutral-600">
-          You already submitted this evaluation. It cannot be changed.
-        </p>
-        <Link
-          href="/forms"
-          className="mt-3 inline-block text-sm font-medium text-brand hover:underline"
-        >
-          Back to My Forms
-        </Link>
-      </Card>
+      <div className="mx-auto max-w-2xl">
+        <Card>
+          <span className="inline-flex items-center rounded-full bg-brand-muted px-2.5 py-0.5 text-xs font-medium text-brand-dark">
+            Submitted
+          </span>
+          <h1 className="mt-3 text-lg font-semibold text-neutral-900">
+            {form.formTitle}
+          </h1>
+          <p className="mt-1 text-sm text-neutral-600">
+            You already submitted this evaluation. It can&rsquo;t be changed.
+          </p>
+          <Link
+            href="/forms"
+            className="mt-4 inline-block text-sm font-medium text-brand hover:underline"
+          >
+            Back to My Forms
+          </Link>
+        </Card>
+      </div>
     );
   }
 

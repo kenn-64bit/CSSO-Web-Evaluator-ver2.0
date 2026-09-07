@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireRole } from "@/lib/auth/session";
 import {
   getAllFormsWithScoring,
@@ -52,6 +53,13 @@ function FormCard({ form }: { form: AdminFormRow }) {
       {form.description ? (
         <p className="mt-2 text-sm text-neutral-600">{form.description}</p>
       ) : null}
+
+      <Link
+        href={`/admin/forms/${form.id}/preview`}
+        className="mt-3 inline-block text-sm font-medium text-brand hover:underline"
+      >
+        Preview evaluator view →
+      </Link>
 
       <div className="mt-4">
         <div className="mb-2 text-sm font-semibold text-neutral-700">
