@@ -4,11 +4,36 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Status
 
-Scaffolded. The Next.js App Router project, the full Supabase schema (migrations
-`supabase/migrations/0001..0013`, `supabase/seed.sql`), the query layer, all routes from
-spec §7, and the required alias-invariant test exist. [architecture (1).md](architecture%20(1).md)
-remains authoritative: "When code and this file disagree, treat this file as the intended
-design and flag the divergence."
+Scaffolded, then revised per [revision001.md](revision001.md). Because no Supabase stack
+was ever connected, the revision was folded **into the base migrations** rather than added
+as patch migrations: `supabase/migrations/0001..0015` + `supabase/seed.sql` produce the
+final schema on a fresh `supabase db reset`. [architecture (1).md](architecture%20(1).md)
+remains authoritative for anything revision001.md does not touch: "When code and this file
+disagree, treat this file as the intended design and flag the divergence."
+
+### revision001.md integration (supersedes parts of architecture (1).md)
+
+- **`executive` role removed.** `app_role` is now `('encrypt','officer','president','admin')`
+  in `0001`; no `EXEC_TO_PRESIDENT` form / `executive_default` scale in the seed; no code
+  references it. architecture (1).md §3 still lists 5 roles + the old `employee` name.
+  `president` is retained, including `OFFICER_TO_PRESIDENT`.
+- **Rating-only** (`0004`). `form_questions.kind` is `('likert','scale')`; there is no
+  `options` column and no free-text input path anywhere. (Former `0014_drop_comment_questions`
+  is gone — folded in.)
+- **Fixed instruments.** 5-question encrypt set (evaluatee = encrypt), 6-question officer set
+  (evaluatee = officer/president). Seeded in `seed.sql` by `evaluatee_role`.
+- **Self-evaluation** (`0014`) — `self_submissions` / `self_answers` / `self_submission_scores`
+  matview / `my_self_evaluations_view`, plus `forms.is_self_evaluation` (declared in `0004`)
+  and 3 self forms. Deliberately separate from `form_assignments` so `no_self_evaluation` and
+  `officer_results_view` are untouched. `refresh_submission_scores()` (`0013`) refreshes both
+  matviews. Routes: `/self/[formId]`.
+- **Per-person scoring** (`0015`) — `result_weights` table (officer 10/35/55, encrypt
+  10/65/25) + `evaluation_band()`; `lib/scoring.ts` mirrors both. `blendFinalScore`
+  renormalizes over available categories (REV-1). Compiled per person under their per-cycle
+  alias at `/admin/compilation` (`lib/queries/adminCompilation.ts`, in-memory join via
+  service role).
+- REV-1 assumptions flagged in code: president reuses the officer instrument and has no
+  compilation row; band boundaries are lower-inclusive cascading.
 
 ### Commands
 

@@ -7,7 +7,6 @@ export type AppRole = Database["public"]["Enums"]["app_role"];
 export const APP_ROLES = [
   "encrypt",
   "officer",
-  "executive",
   "president",
   "admin",
 ] as const satisfies readonly AppRole[];
@@ -16,7 +15,6 @@ export const APP_ROLES = [
 export const ROLE_HOME: Record<AppRole, string> = {
   encrypt: "/encrypt",
   officer: "/officer",
-  executive: "/executive",
   president: "/president",
   admin: "/admin",
 };

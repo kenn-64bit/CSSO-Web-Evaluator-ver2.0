@@ -2,6 +2,7 @@
 -- profiles (never trusts the client) and runs with definer rights.
 
 -- Refresh the on-demand score aggregation (spec §5: not on every write).
+-- revision001.md: also refreshes the self-evaluation aggregation (0014).
 create or replace function refresh_submission_scores()
 returns void
 language plpgsql
@@ -13,6 +14,7 @@ begin
     raise exception 'not authorized';
   end if;
   refresh materialized view concurrently submission_scores;
+  refresh materialized view concurrently self_submission_scores;
 end;
 $$;
 

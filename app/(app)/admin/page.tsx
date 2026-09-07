@@ -14,6 +14,12 @@ export default async function AdminHome() {
           description: "Every submission, full text, real identities.",
         },
         {
+          href: "/admin/compilation",
+          label: "Compilation",
+          description:
+            "Per-person results under a codename: self / officer / encrypt blend and band.",
+        },
+        {
           href: "/admin/roster",
           label: "Roster",
           description: "Read-only. Membership is edited in Supabase Studio.",

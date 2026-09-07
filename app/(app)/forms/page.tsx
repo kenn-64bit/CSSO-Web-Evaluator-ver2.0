@@ -53,15 +53,15 @@ export default async function MyFormsPage() {
       ) : (
         <ul className="space-y-3">
           {pending.map((a) => (
-            <li key={a.assignmentId}>
+            <li key={a.key}>
               <Link
-                href={`/forms/${a.assignmentId}`}
+                href={a.href}
                 className="block rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
               >
                 <Card className="flex items-center justify-between gap-4 transition-colors motion-reduce:transition-none hover:border-brand">
                   <div>
                     <p className="text-xs font-medium uppercase tracking-[0.14em] text-brand">
-                      Evaluation
+                      {a.kind === "self" ? "Self-evaluation" : "Evaluation"}
                     </p>
                     <div className="mt-0.5 text-sm font-semibold text-neutral-900">
                       {a.formTitle}

@@ -1,13 +1,12 @@
 import type { FormQuestion, ScaleOption } from "@/lib/queries/forms";
 import { RatingMatrix } from "./RatingMatrix";
-import { QuestionRenderer } from "./QuestionRenderer";
 import { Card } from "@/components/ui/Card";
 
-const isRating = (q: FormQuestion) =>
-  q.kind === "likert" || q.kind === "scale";
-
-// Presentational core shared by the real fill-out screen (FormShell) and the
-// admin preview. No <form>, no submit — just the header and the questions.
+// Presentational core shared by the real fill-out screen (FormShell), the
+// self-evaluation screen (SelfFormShell) and the admin preview. No <form>, no
+// submit — just the header and the questions. Forms are rating-only
+// (revision001.md): every question is rendered by RatingMatrix, there is no
+// free-text input.
 export function FormBody({
   title,
   evaluateeName,
@@ -23,8 +22,6 @@ export function FormBody({
   scaleOptions: ScaleOption[];
   heading?: "h1" | "h2";
 }) {
-  const ratingQuestions = questions.filter(isRating);
-  const firstRatingId = ratingQuestions[0]?.id;
   const Heading = heading;
 
   return (
@@ -49,18 +46,7 @@ export function FormBody({
         {questions.length === 0 ? (
           <p className="text-sm text-neutral-600">This form has no questions.</p>
         ) : (
-          questions.map((q) => {
-            if (isRating(q)) {
-              return q.id === firstRatingId ? (
-                <RatingMatrix
-                  key="rating-matrix"
-                  questions={ratingQuestions}
-                  options={scaleOptions}
-                />
-              ) : null;
-            }
-            return <QuestionRenderer key={q.id} question={q} />;
-          })
+          <RatingMatrix questions={questions} options={scaleOptions} />
         )}
       </Card>
     </div>

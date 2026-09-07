@@ -1,7 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
 
-export interface PendingAssignment {
-  assignmentId: string;
+export interface PendingForm {
+  key: string;
+  href: string;
+  kind: "assignment" | "self";
   formCode: string;
   formTitle: string;
   formDescription: string | null;
@@ -9,27 +11,52 @@ export interface PendingAssignment {
 }
 
 // "My Forms": an assignment shows here only while a form_assignments row exists
-// for the user in the active cycle with NO attached submission (spec §5).
+// for the user in the active cycle with NO attached submission (spec §5). The
+// user's own self-evaluation (revision001.md) is merged in from a separate view
+// and shows until they submit it.
 export async function getMyPendingForms(
   cycleId: string,
-): Promise<PendingAssignment[]> {
+): Promise<PendingForm[]> {
   const supabase = await createClient();
-  const { data } = await supabase
-    .from("my_assignments_view")
-    .select(
-      "assignment_id, form_code, form_title, form_description, evaluatee_name, submission_id",
-    )
-    .eq("cycle_id", cycleId);
 
-  return (data ?? [])
+  const [{ data: assignments }, { data: self }] = await Promise.all([
+    supabase
+      .from("my_assignments_view")
+      .select(
+        "assignment_id, form_code, form_title, form_description, evaluatee_name, submission_id",
+      )
+      .eq("cycle_id", cycleId),
+    supabase
+      .from("my_self_evaluations_view")
+      .select("form_id, form_code, form_title, form_description, submission_status"),
+  ]);
+
+  const pending: PendingForm[] = (assignments ?? [])
     .filter((row) => row.submission_id === null && row.assignment_id !== null)
     .map((row) => ({
-      assignmentId: row.assignment_id ?? "",
+      key: `assignment:${row.assignment_id}`,
+      href: `/forms/${row.assignment_id}`,
+      kind: "assignment" as const,
       formCode: row.form_code ?? "",
       formTitle: row.form_title ?? "",
       formDescription: row.form_description,
       evaluateeName: row.evaluatee_name ?? "",
     }));
+
+  for (const row of self ?? []) {
+    if (row.submission_status === "submitted" || !row.form_id) continue;
+    pending.push({
+      key: `self:${row.form_id}`,
+      href: `/self/${row.form_id}`,
+      kind: "self",
+      formCode: row.form_code ?? "",
+      formTitle: row.form_title ?? "",
+      formDescription: row.form_description,
+      evaluateeName: "yourself",
+    });
+  }
+
+  return pending;
 }
 
 export interface ScaleOption {
@@ -38,11 +65,12 @@ export interface ScaleOption {
   displayOrder: number;
 }
 
+// Forms are rating-only (revision001.md) — no free-text input path.
 export interface FormQuestion {
   id: string;
   orderIndex: number;
   prompt: string;
-  kind: "likert" | "scale" | "text" | "choice";
+  kind: "likert" | "scale";
   isRequired: boolean;
 }
 

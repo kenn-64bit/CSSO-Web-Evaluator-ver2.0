@@ -225,7 +225,6 @@ export type Database = {
           id: string
           is_required: boolean
           kind: string
-          options: Json | null
           order_index: number
           prompt: string
         }
@@ -234,7 +233,6 @@ export type Database = {
           id?: string
           is_required?: boolean
           kind: string
-          options?: Json | null
           order_index: number
           prompt: string
         }
@@ -243,7 +241,6 @@ export type Database = {
           id?: string
           is_required?: boolean
           kind?: string
-          options?: Json | null
           order_index?: number
           prompt?: string
         }
@@ -265,6 +262,7 @@ export type Database = {
           evaluator_role: Database["public"]["Enums"]["app_role"]
           id: string
           is_active: boolean
+          is_self_evaluation: boolean
           rating_scale_key: string | null
           results_visible_to_evaluatee: boolean
           title: string
@@ -276,6 +274,7 @@ export type Database = {
           evaluator_role: Database["public"]["Enums"]["app_role"]
           id?: string
           is_active?: boolean
+          is_self_evaluation?: boolean
           rating_scale_key?: string | null
           results_visible_to_evaluatee?: boolean
           title: string
@@ -287,6 +286,7 @@ export type Database = {
           evaluator_role?: Database["public"]["Enums"]["app_role"]
           id?: string
           is_active?: boolean
+          is_self_evaluation?: boolean
           rating_scale_key?: string | null
           results_visible_to_evaluatee?: boolean
           title?: string
@@ -376,6 +376,112 @@ export type Database = {
           label?: string
         }
         Relationships: []
+      }
+      result_weights: {
+        Row: {
+          evaluatee_role: Database["public"]["Enums"]["app_role"]
+          source_key: string
+          weight: number
+        }
+        Insert: {
+          evaluatee_role: Database["public"]["Enums"]["app_role"]
+          source_key: string
+          weight: number
+        }
+        Update: {
+          evaluatee_role?: Database["public"]["Enums"]["app_role"]
+          source_key?: string
+          weight?: number
+        }
+        Relationships: []
+      }
+      self_answers: {
+        Row: {
+          id: string
+          question_id: string
+          self_submission_id: string
+          value_numeric: number | null
+          value_text: string | null
+        }
+        Insert: {
+          id?: string
+          question_id: string
+          self_submission_id: string
+          value_numeric?: number | null
+          value_text?: string | null
+        }
+        Update: {
+          id?: string
+          question_id?: string
+          self_submission_id?: string
+          value_numeric?: number | null
+          value_text?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "self_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "form_questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "self_answers_self_submission_id_fkey"
+            columns: ["self_submission_id"]
+            isOneToOne: false
+            referencedRelation: "self_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      self_submissions: {
+        Row: {
+          cycle_id: string
+          form_id: string
+          id: string
+          status: string
+          submitted_at: string
+          user_id: string
+        }
+        Insert: {
+          cycle_id: string
+          form_id: string
+          id?: string
+          status?: string
+          submitted_at?: string
+          user_id: string
+        }
+        Update: {
+          cycle_id?: string
+          form_id?: string
+          id?: string
+          status?: string
+          submitted_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "self_submissions_cycle_id_fkey"
+            columns: ["cycle_id"]
+            isOneToOne: false
+            referencedRelation: "evaluation_cycles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "self_submissions_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "forms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "self_submissions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       roster: {
         Row: {
@@ -555,11 +661,45 @@ export type Database = {
         }
         Relationships: []
       }
+      self_submission_scores: {
+        Row: {
+          normalized_score: number | null
+          self_submission_id: string | null
+          total_sum: number | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "self_submissions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      my_self_evaluations_view: {
+        Row: {
+          cycle_id: string | null
+          form_code: string | null
+          form_description: string | null
+          form_id: string | null
+          form_title: string | null
+          rating_scale_key: string | null
+          self_submission_id: string | null
+          submission_status: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       current_app_role: {
         Args: never
         Returns: Database["public"]["Enums"]["app_role"]
+      }
+      evaluation_band: {
+        Args: { score: number }
+        Returns: string
       }
       refresh_submission_scores: { Args: never; Returns: undefined }
       regenerate_aliases: { Args: { target_cycle: string }; Returns: number }
@@ -569,7 +709,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "encrypt" | "officer" | "executive" | "president" | "admin"
+      app_role: "encrypt" | "officer" | "president" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -700,7 +840,7 @@ export const Constants = {
   },
   public: {
     Enums: {
-      app_role: ["encrypt", "officer", "executive", "president", "admin"],
+      app_role: ["encrypt", "officer", "president", "admin"],
     },
   },
 } as const

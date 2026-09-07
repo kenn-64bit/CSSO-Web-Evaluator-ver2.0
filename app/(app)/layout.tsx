@@ -38,6 +38,12 @@ export default async function AppLayout({
                   All Results
                 </Link>
                 <Link
+                  href="/admin/compilation"
+                  className="text-neutral-600 hover:text-neutral-900"
+                >
+                  Compilation
+                </Link>
+                <Link
                   href="/admin/forms"
                   className="text-neutral-600 hover:text-neutral-900"
                 >

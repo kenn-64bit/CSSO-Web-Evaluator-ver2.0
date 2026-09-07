@@ -44,16 +44,14 @@ export async function submitForm(
     }
     if (value === "") continue;
 
-    if (q.kind === "likert" || q.kind === "scale") {
-      const allowed = new Set(form.scaleOptions.map((o) => o.optionKey));
-      if (!allowed.has(value)) {
-        return { error: "Please answer every required question." };
-      }
-      // Spec §5: the selected option key is stored in value_text.
-      rows.push({ question_id: q.id, value_text: value, value_numeric: null });
-    } else {
-      rows.push({ question_id: q.id, value_text: value, value_numeric: null });
+    // Forms are rating-only (revision001.md): every answer must be one of the
+    // form's rating option keys — no free-text is accepted.
+    const allowed = new Set(form.scaleOptions.map((o) => o.optionKey));
+    if (!allowed.has(value)) {
+      return { error: "Please answer every required question." };
     }
+    // Spec §5: the selected option key is stored in value_text.
+    rows.push({ question_id: q.id, value_text: value, value_numeric: null });
   }
 
   const submissionId = await getOrCreateDraft(assignmentId);

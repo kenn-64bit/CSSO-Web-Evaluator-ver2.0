@@ -148,6 +148,34 @@ describe.skipIf(!configured)("alias invariant", () => {
       );
     }
 
+    // A self-evaluation by one of the critics — must stay private to them.
+    const { data: selfForm } = await admin
+      .from("forms")
+      .select("id")
+      .eq("code", "OFFICER_SELF")
+      .single();
+    const { data: selfSub } = await admin
+      .from("self_submissions")
+      .insert({
+        cycle_id: cycleId,
+        form_id: selfForm!.id,
+        user_id: evaluators[0].authId,
+        status: "submitted",
+      })
+      .select("id")
+      .single();
+    const { data: selfQuestions } = await admin
+      .from("form_questions")
+      .select("id")
+      .eq("form_id", selfForm!.id);
+    await admin.from("self_answers").insert(
+      (selfQuestions ?? []).map((q) => ({
+        self_submission_id: selfSub!.id,
+        question_id: q.id,
+        value_text: "3",
+      })),
+    );
+
     await admin.rpc("refresh_submission_scores");
   });
 
@@ -203,6 +231,19 @@ describe.skipIf(!configured)("alias invariant", () => {
 
     const al = await c.from("aliases").select("*");
     expect(al.data ?? []).toHaveLength(0);
+  });
+
+  it("keeps another user's self-evaluation private", async () => {
+    const c = await officerClient();
+
+    const subs = await c.from("self_submissions").select("*");
+    expect(subs.data ?? []).toHaveLength(0);
+
+    const ans = await c.from("self_answers").select("*");
+    expect(ans.data ?? []).toHaveLength(0);
+
+    const scores = await c.from("self_submission_scores").select("*");
+    expect(scores.data ?? []).toHaveLength(0);
   });
 
   it("withholds results below the O-3 threshold of 3 submissions", async () => {
