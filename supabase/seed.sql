@@ -37,15 +37,14 @@ insert into forms (code, title, description, evaluator_role, evaluatee_role, res
   ('OFFICER_TO_PRESIDENT','Officer evaluation of president', 'Officer evaluates the president.',      'officer',   'president', false, 'officer_default'),
   ('EXEC_TO_PRESIDENT',   'Executive evaluation of president','Executive evaluates the president.',   'executive', 'president', false, 'executive_default');
 
--- A small, uniform question set per form: 3 likert + 1 free-text.
+-- A small, uniform question set per form: 3 likert (rating-only).
 insert into form_questions (form_id, order_index, prompt, kind, is_required)
 select f.id, q.order_index, q.prompt, q.kind, q.is_required
 from forms f
 cross join (values
   (0, 'Demonstrates competence in assigned responsibilities.', 'likert', true),
   (1, 'Communicates and collaborates effectively.',            'likert', true),
-  (2, 'Acts with professionalism and integrity.',              'likert', true),
-  (3, 'Additional comments (optional).',                       'text',   false)
+  (2, 'Acts with professionalism and integrity.',              'likert', true)
 ) as q(order_index, prompt, kind, is_required);
 
 -- ── Active cycle ────────────────────────────────────────────────────────────
@@ -54,6 +53,7 @@ insert into evaluation_cycles (name, opens_at, closes_at, is_active) values
 
 -- ── Local-dev roster (real sign-in requires these emails to exist here) ──────
 insert into roster (email, full_name, role, is_active) values
+  ('kenn.jarangue@cvsu.edu.ph',      'Kenn Jarangue',   'admin',   true),
   ('jonmer.evangelista@cvsu.edu.ph',      'Jonmer Evangelista',   'officer',   true),
   ('macielito.devera@cvsu.edu.ph',      'Ma. Cielito De VERA',    'officer',   true),
   ('mikeangelo.metillo@cvsu.edu.ph',      'Angelo Metillo',    'officer',   true),

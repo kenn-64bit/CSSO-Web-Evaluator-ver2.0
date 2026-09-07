@@ -1,39 +1,30 @@
-import type { FormQuestion, ScaleOption } from "@/lib/queries/forms";
-import { LikertScale } from "./LikertScale";
+import type { FormQuestion } from "@/lib/queries/forms";
 
-export function QuestionRenderer({
-  question,
-  scaleOptions,
-}: {
-  question: FormQuestion;
-  scaleOptions: ScaleOption[];
-}) {
+// Free-text questions (`text` / `choice`). Likert/`scale` questions are rendered
+// together by RatingMatrix, not here.
+export function QuestionRenderer({ question }: { question: FormQuestion }) {
   const name = `q:${question.id}`;
 
   return (
-    <div className="border-b border-neutral-100 py-4 last:border-b-0">
-      <label className="text-sm font-medium text-neutral-800" htmlFor={name}>
+    <div>
+      <label
+        htmlFor={name}
+        className="text-sm font-semibold text-neutral-800"
+      >
         {question.prompt}
         {question.isRequired ? (
-          <span className="ml-1 text-red-500">*</span>
+          <span className="ml-1 text-red-500" aria-hidden="true">
+            *
+          </span>
         ) : null}
       </label>
-
-      {question.kind === "likert" || question.kind === "scale" ? (
-        <LikertScale
-          name={name}
-          options={scaleOptions}
-          required={question.isRequired}
-        />
-      ) : (
-        <textarea
-          id={name}
-          name={name}
-          required={question.isRequired}
-          rows={3}
-          className="mt-2 w-full rounded-md border border-neutral-300 p-2 text-sm focus:border-brand focus:outline-none"
-        />
-      )}
+      <textarea
+        id={name}
+        name={name}
+        required={question.isRequired}
+        rows={4}
+        className="mt-2 w-full rounded-lg border border-neutral-300 p-3 text-sm text-neutral-900 transition-colors motion-reduce:transition-none placeholder:text-neutral-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"
+      />
     </div>
   );
 }
